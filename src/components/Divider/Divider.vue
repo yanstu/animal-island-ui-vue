@@ -1,14 +1,36 @@
+<template>
+  <div
+    :class="[
+      styles.divider,
+      type ? styles[type] : '',
+      className,
+      $attrs.class
+    ]"
+    :style="style"
+  />
+</template>
+
 <script setup lang="ts">
 import styles from './divider.module.less';
 
-defineOptions({
-    name: 'Divider',
-    inheritAttrs: false,
+// 类型定义
+export type DividerType = 'line-brown' | 'line-teal' | 'line-yellow' | 'wave-yellow';
+
+interface DividerProps {
+  type?: DividerType;
+  className?: string;
+  style?: Record<string, string | number>; 
+}
+
+// 定义 Props + 默认值
+const props = withDefaults(defineProps<DividerProps>(), {
+  type: 'line-brown',
+  className: '',
+  style: () => ({}),
 });
 
-export interface DividerProps {}
+defineOptions({
+  name: 'Divider',
+  inheritAttrs: false
+});
 </script>
-
-<template>
-    <div :class="styles.divider" v-bind="$attrs" />
-</template>

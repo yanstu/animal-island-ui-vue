@@ -31,6 +31,8 @@ import {
     Tag,
     Textarea,
     Tooltip,
+    Loading,
+    Typewriter,
 } from '../src';
 import ApiTable from './ApiTable.vue';
 import CodeBlock from './CodeBlock.vue';
@@ -64,6 +66,8 @@ const titleModalOpen = ref(false);
 const customFooterOpen = ref(false);
 const footerlessModalOpen = ref(false);
 const textareaValue = ref('今晚 20:00 在广场集合，准备烟火大会布置。');
+const isLoadingActive = ref(true)
+const replayKey = ref(0)
 
 const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
 </script>
@@ -217,9 +221,9 @@ const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
                                 danger / ghost / loading / disabled 状态
                             </div>
                             <div class="demo-row">
-                                <Button type="primary" loading>保存中</Button>
-                                <Button danger>删除</Button>
+                                <Button danger  >删除</Button>
                                 <Button type="primary" ghost>透明强调</Button>
+                                <Button type="primary" loading>保存中</Button>
                                 <Button disabled>暂不可用</Button>
                             </div>
                         </div>
@@ -828,7 +832,7 @@ const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
                         </Card>
                     </Cursor>
                 </template>
-
+                
                 <template v-else-if="activeKey === 'modal'">
                     <div class="demo-stack">
                         <div class="demo-group">
@@ -911,10 +915,71 @@ const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
                 </template>
 
                 <template v-else-if="activeKey === 'divider-comp'">
+                <div class="demo-stack">
+                    <div class="demo-copy">默认棕色线</div>
+                    <Divider />
+
+                    <div class="demo-copy">青色线</div>
+                    <Divider type="line-teal" />
+
+                    <div class="demo-copy">黄色线</div>
+                    <Divider type="line-yellow" />
+
+                    <div class="demo-copy">黄色波浪线</div>
+                    <Divider type="wave-yellow" />
+                </div>
+                </template>
+
+                <template v-else-if="activeKey === 'loading'">
+                <div class="demo-stack">
+                    <div class="demo-group">
+                    <div class="demo-label">加载动画</div>
+                    <Card style="position: relative; height: 550px; overflow: hidden; background: #1a1a1a; border-radius: 8px;">
+                        <!-- 被遮罩的内容层：降低层级或让 Loading 的层级更高 -->
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; color: #fff; text-align: center; z-index: 1;">
+                        <h3 style="margin-bottom: 8px; color: #fff;">这是被遮罩的内容区域</h3>
+                        <p style="font-size: 13px; color: #aaa; margin: 4px 0;">当 Loading 的 active 为 true 时，黑色背景会完全挡住这里。</p>
+                        <p style="font-size: 13px; color: #aaa; margin: 4px 0;">当 active 变为 false 时，会触发酷炫的圆形扩散退出动画。</p>
+                        </div>
+                        <Loading 
+                        :active="isLoadingActive" 
+                        :style="{ zIndex: 10 }" 
+                        />
+                    </Card>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        <Button type="primary" @click="isLoadingActive = !isLoadingActive">
+                        {{ isLoadingActive ? '退出' : '加载' }}
+                        </Button>
+                    </div>
+                    </div>
+                </div>
+                </template>
+
+                <template v-else-if="activeKey === 'typewriter'">
                     <div class="demo-stack">
-                        <div class="demo-copy">上方内容</div>
-                        <Divider />
-                        <div class="demo-copy">下方内容</div>
+                        <div class="demo-group">
+                        <div class="demo-label">默认打字机</div>
+                        <Card>
+                            <Typewriter :trigger="replayKey">
+                                你好，欢迎来到动物岛！今天的天气真不错呢～
+                            </Typewriter>
+                        </Card>
+                        </div>
+                        <div class="demo-group">
+                        <div class="demo-label">快速打字 (speed=40)</div>
+                        <Card>
+                            <Typewriter :speed="40" :trigger="replayKey">
+                            <div>第一行：钓到石头了！</div>
+                            <div>第二行：竟然连这种都能钓起来...</div>
+                            <div style="color: #FD9303; font-weight: 700">第三行：继续加油吧！</div>
+                        </Typewriter>
+                        </Card>
+                        </div>
+                        <div class="demo-row">
+                        <Button type="primary" @click="replayKey++">
+                            重新播放动画
+                        </Button>
+                        </div>
                     </div>
                 </template>
             </div>
@@ -930,7 +995,7 @@ const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
 
 <style scoped>
 .page-shell {
-    width: min(100%, 980px);
+    width: min(100%, 1200px);
     margin: 0 auto;
 }
 
@@ -1019,7 +1084,7 @@ const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
 
 .demo-label {
     color: #a0936e;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.2px;
 }

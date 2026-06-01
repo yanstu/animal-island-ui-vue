@@ -47,6 +47,8 @@ const componentItems = [
     { key: 'cursor', label: 'Cursor 光标' },
     { key: 'modal', label: 'Modal 弹窗' },
     { key: 'divider-comp', label: 'Divider 分割线' },
+    { key: 'loading', label: 'Loading 加载' },
+    { key: 'typewriter', label: 'Typewriter 打字机' },
 ];
 
 const hash = ref(window.location.hash.slice(1) || '/');

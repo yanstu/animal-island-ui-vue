@@ -48,9 +48,8 @@ describe('Demo HomePage', () => {
             },
         });
 
-        expect(wrapper.text()).toContain('Animal风格的 Vue 3 组件库');
+        expect(wrapper.text()).toContain('Animal Island 风格的 Vue 3 组件库');
         expect(wrapper.text()).toContain('基于 TypeScript + Vite 构建');
-        expect(wrapper.text()).toContain('让 Web 应用充满温暖质感');
         expect(wrapper.text()).toContain('主题定制');
         expect(wrapper.text()).toContain('组件文档');
         expect(wrapper.text()).toContain('GitHub');

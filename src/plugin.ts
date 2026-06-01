@@ -29,6 +29,7 @@ import { Tabs } from './components/Tabs';
 import { Tag } from './components/Tag';
 import { Textarea } from './components/Textarea';
 import { Tooltip } from './components/Tooltip';
+import { Loading } from './components/Loading';
 
 const components = [
     Avatar,
@@ -61,6 +62,7 @@ const components = [
     Tag,
     Textarea,
     Tooltip,
+    Loading,
 ];
 
 const AnimalIslandUIVue: Plugin = {

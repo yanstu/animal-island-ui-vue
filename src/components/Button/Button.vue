@@ -62,7 +62,7 @@ const buttonClassName = computed(() =>
     )
 );
 
-const isDisabled = computed(() => props.disabled || props.loading);
+const isDisabled = computed(() => props.disabled );
 const hasIcon = computed(() => Boolean(slots.icon || props.icon));
 </script>
 

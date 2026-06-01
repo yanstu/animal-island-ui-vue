@@ -517,7 +517,32 @@ export const docsMap: Record<string, ComponentDoc> = {
         title: 'Divider 分割线',
         desc: '适合隔开页面段落、表单区块和卡片内容。',
         sections: [
-            section('基础用法', '简洁的装饰分割线，适合长内容页面的区块间隔。', `<Divider />`, []),
+        section('基础用法', '简洁的装饰分割线，适合长内容页面的区块间隔。', `<Divider type="line-yellow" />`, [
+            row('type', '分割线类型', 'line-brown | line-teal | line-yellow | wave-yellow', 'line-brown'),
+        ]),
+        ],
+    },
+    loading: {
+        title: 'Loading 加载动画',
+        desc: '提供流畅的岛屿动效加载，用于页面/模块等待状态提示。',
+        sections: [
+            section('基础用法', '默认全屏展示加载动画，通过 active 控制显示与隐藏。', `<Loading :active="true" />`, [
+            row('active', '控制加载显示/隐藏', 'boolean', 'true'),
+            row('className', '自定义样式类名', 'string'),
+            row('style', '自定义行内样式', 'CSSProperties'),
+            ]),
+        ],
+    },
+    typewriter: {
+        title: 'Typewriter 打字机',
+        desc: '打字机组件 — 按字符逐个显示文本，支持多行与 ReactNode 富内容，不改变原有样式',
+        sections: [
+            section('基础用法', '支持普通文本、HTML、颜色样式、多行结构，可控制打字速度、重新播放与完成回调。', `<Typewriter>你好，欢迎来到动物岛！</Typewriter>`, [
+                row('speed', '打字速度（毫秒）', 'number', '90'),
+                row('trigger', '重新播放触发器，值变化即重播', 'unknown', '-'),
+                row('autoPlay', '是否自动开始播放', 'boolean', 'true'),
+                row('onDone', '打字完成回调', '() => void', '-'),
+            ]),
         ],
     },
 };
