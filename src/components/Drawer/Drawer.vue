@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, toRef, useId, watch } from 'vue';
 import { classNames } from '@/internal/classNames';
+import { useFocusTrap } from '@/internal/useFocusTrap';
 import styles from './drawer.module.less';
 
 export interface DrawerProps {
@@ -43,6 +44,8 @@ const state = ref<'open' | 'closed'>(props.open ? 'open' : 'closed');
 const titleId = useId();
 let hideTimer: ReturnType<typeof setTimeout> | null = null;
 let restoreFocusTarget: HTMLElement | null = null;
+
+useFocusTrap(panelRef, toRef(props, 'open'));
 
 const panelClassName = computed(() =>
     classNames(
@@ -97,11 +100,10 @@ watch(
 
         if (open) {
             restoreFocusTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-            state.value = 'closed';
+            state.value = 'open';
             document.body.style.overflow = 'hidden';
             document.addEventListener('keydown', handleKeydown);
             await nextTick();
-            state.value = 'open';
             if (closeButtonRef.value) {
                 closeButtonRef.value.focus();
             } else {
@@ -133,42 +135,44 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div v-if="visible" :class="styles.drawer" :data-state="state" v-bind="$attrs">
-        <div :class="styles.mask" @click="handleMaskClick" />
-        <aside
-            ref="panelRef"
-            data-drawer-panel
-            :data-state="state"
-            :class="panelClassName"
-            :style="panelStyle"
-            role="dialog"
-            aria-modal="true"
-            :aria-labelledby="title || $slots.title ? titleId : undefined"
-            tabindex="-1"
-        >
-            <div v-if="title || closable" :class="styles.header">
-                <div
-                    v-if="title || $slots.title"
-                    :id="titleId"
-                    :class="styles.title"
-                    data-drawer-title
-                >
-                    <slot name="title">{{ title }}</slot>
+    <Teleport to="body">
+        <div v-if="visible" :class="styles.drawer" :data-state="state" v-bind="$attrs">
+            <div :class="styles.mask" @click="handleMaskClick" />
+            <aside
+                ref="panelRef"
+                data-drawer-panel
+                :data-state="state"
+                :class="panelClassName"
+                :style="panelStyle"
+                role="dialog"
+                aria-modal="true"
+                :aria-labelledby="title || $slots.title ? titleId : undefined"
+                tabindex="-1"
+            >
+                <div v-if="title || closable" :class="styles.header">
+                    <div
+                        v-if="title || $slots.title"
+                        :id="titleId"
+                        :class="styles.title"
+                        data-drawer-title
+                    >
+                        <slot name="title">{{ title }}</slot>
+                    </div>
+                    <button
+                        v-if="closable"
+                        ref="closeButtonRef"
+                        type="button"
+                        :class="styles.close"
+                        aria-label="Close"
+                        @click="handleClose"
+                    >
+                        ×
+                    </button>
                 </div>
-                <button
-                    v-if="closable"
-                    ref="closeButtonRef"
-                    type="button"
-                    :class="styles.close"
-                    aria-label="Close"
-                    @click="handleClose"
-                >
-                    ×
-                </button>
-            </div>
-            <div :class="styles.body">
-                <slot />
-            </div>
-        </aside>
-    </div>
+                <div :class="styles.body">
+                    <slot />
+                </div>
+            </aside>
+        </div>
+    </Teleport>
 </template>

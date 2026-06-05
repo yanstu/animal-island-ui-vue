@@ -2,6 +2,16 @@
 // Collapse Styles - Animal Crossing Theme
 // ============================================
 
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.group .faqCard {
+    margin-bottom: 0;
+}
+
 .faqCard {
     position: relative;
     background: var(--animal-bg-color);
@@ -102,7 +112,7 @@
 .answerWrapper {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: grid-template-rows 0.32s var(--animal-motion-ease);
     will-change: grid-template-rows;
 
     .expanded & {

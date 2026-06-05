@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, useId, watch } from 'vue';
 import styles from './popover.module.less';
+import { useFloating } from '@/internal/useFloating';
 
 export interface PopoverProps {
     content: string;
@@ -18,7 +19,13 @@ const props = withDefaults(defineProps<PopoverProps>(), {
 
 const visible = ref(props.defaultOpen);
 const rootRef = ref<HTMLElement | null>(null);
+const popupRef = ref<HTMLElement | null>(null);
 const popupId = useId();
+
+const { floatingStyle } = useFloating(rootRef, popupRef, visible, {
+    placement: 'bottom',
+    offset: 12,
+});
 
 const toggle = () => {
     visible.value = !visible.value;
@@ -30,7 +37,9 @@ const close = () => {
 
 const handleDocumentMouseDown = (event: MouseEvent) => {
     if (!visible.value) return;
-    if (rootRef.value?.contains(event.target as Node)) return;
+    const target = event.target as Node;
+    if (rootRef.value?.contains(target)) return;
+    if (popupRef.value?.contains(target)) return;
     close();
 };
 
@@ -76,15 +85,19 @@ onBeforeUnmount(() => {
         >
             <slot />
         </span>
-        <span
-            v-if="visible"
-            :id="popupId"
-            :class="styles.popup"
-            role="tooltip"
-            data-layer="floating"
-            data-state="open"
-        >
-            {{ content }}
-        </span>
+        <Teleport to="body">
+            <span
+                v-if="visible"
+                :id="popupId"
+                ref="popupRef"
+                :class="styles.popup"
+                :style="floatingStyle"
+                role="tooltip"
+                data-layer="floating"
+                data-state="open"
+            >
+                {{ content }}
+            </span>
+        </Teleport>
     </span>
 </template>

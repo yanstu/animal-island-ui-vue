@@ -188,7 +188,8 @@ describe('Demo ComponentPage', () => {
         expect(collapseWrapper.text()).toContain('基础用法');
         expect(collapseWrapper.text()).toContain('defaultExpanded 默认展开');
         expect(collapseWrapper.text()).toContain('disabled 禁用状态');
-        expect(collapseWrapper.findAll('.demo-group')).toHaveLength(3);
+        expect(collapseWrapper.text()).toContain('多面板 / 手风琴');
+        expect(collapseWrapper.findAll('.demo-group')).toHaveLength(4);
 
         expect(paginationWrapper.text()).toContain('标准分页');
         expect(paginationWrapper.text()).toContain('精简分页');

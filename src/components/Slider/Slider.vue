@@ -96,6 +96,8 @@ const handleInput = (event: Event) => {
                 :step="step"
                 :disabled="disabled"
                 :value="safeValue"
+                aria-label="滑块数值"
+                :aria-valuetext="String(safeValue)"
                 @input="handleInput"
             />
         </div>

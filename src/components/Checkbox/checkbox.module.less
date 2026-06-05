@@ -59,6 +59,20 @@
     font-size: 14px;
     line-height: 1;
     transform: translateY(-1px);
+    animation: animal-check-pop var(--animal-motion-duration-base)
+        var(--animal-motion-ease-bounce);
+}
+
+@keyframes animal-check-pop {
+    from {
+        opacity: 0;
+        transform: translateY(-1px) scale(0.2);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(-1px) scale(1);
+    }
 }
 
 .label {

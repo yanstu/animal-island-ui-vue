@@ -68,17 +68,15 @@
 }
 
 .dropdown {
-    position: absolute;
-    top: calc(100% + 10px);
-    left: 0;
-    z-index: 10;
-    width: 100%;
+    z-index: 1000;
+    box-sizing: border-box;
+    max-width: min(360px, calc(100vw - 16px));
     padding: 10px;
     border: 2px solid #d4c9b4;
     border-radius: 20px;
     background: #fdfaf0;
     box-shadow: var(--animal-shadow-base);
-    animation: animal-select-enter 0.2s var(--animal-motion-ease);
+    animation: animal-select-enter 0.22s var(--animal-motion-ease-bounce);
 }
 
 .option {

@@ -21,6 +21,7 @@ import { Pagination } from './components/Pagination';
 import { Popover } from './components/Popover';
 import { Progress } from './components/Progress';
 import { Radio } from './components/Radio';
+import { RadioGroup } from './components/RadioGroup';
 import { Rate } from './components/Rate';
 import { Select } from './components/Select';
 import { Slider } from './components/Slider';
@@ -54,6 +55,7 @@ const components = [
     Popover,
     Progress,
     Radio,
+    RadioGroup,
     Rate,
     Select,
     Slider,

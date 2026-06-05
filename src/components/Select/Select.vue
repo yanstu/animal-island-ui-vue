@@ -3,6 +3,7 @@ import { computed, getCurrentInstance, onBeforeUnmount, ref, useId, watch } from
 import styles from './select.module.less';
 import { classNames } from '@/internal/classNames';
 import { useControllable } from '@/internal/useControllable';
+import { useFloating } from '@/internal/useFloating';
 
 export interface SelectOption {
     /** 面板中展示的文本。 */
@@ -52,7 +53,14 @@ const rawProps = computed(() => instance?.vnode.props ?? {});
 const isOpen = ref(false);
 const activeIndex = ref(-1);
 const rootRef = ref<HTMLElement | null>(null);
+const dropdownRef = ref<HTMLElement | null>(null);
 const listboxId = useId();
+
+const { floatingStyle } = useFloating(rootRef, dropdownRef, isOpen, {
+    placement: 'bottom',
+    offset: 10,
+    matchWidth: true,
+});
 
 const controlledValue = computed(() =>
     'modelValue' in rawProps.value
@@ -188,7 +196,9 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 const handleDocumentMouseDown = (event: MouseEvent) => {
     if (!isOpen.value) return;
-    if (rootRef.value?.contains(event.target as Node)) return;
+    const target = event.target as Node;
+    if (rootRef.value?.contains(target)) return;
+    if (dropdownRef.value?.contains(target)) return;
     closeDropdown();
 };
 
@@ -199,6 +209,16 @@ watch(isOpen, (open) => {
     }
 
     document.removeEventListener('mousedown', handleDocumentMouseDown);
+});
+
+watch(activeIndex, (index) => {
+    if (index < 0 || !dropdownRef.value) return;
+    const optionEl = dropdownRef.value.querySelector<HTMLElement>(
+        `[data-option-index="${index}"]`
+    );
+    if (optionEl && typeof optionEl.scrollIntoView === 'function') {
+        optionEl.scrollIntoView({ block: 'nearest' });
+    }
 });
 
 onBeforeUnmount(() => {
@@ -227,36 +247,42 @@ onBeforeUnmount(() => {
             </span>
             <span :class="styles.arrow">▾</span>
         </button>
-        <div
-            v-if="isOpen"
-            :id="listboxId"
-            :class="styles.dropdown"
-            role="listbox"
-            data-layer="floating"
-            data-state="open"
-        >
-            <button
-                v-for="(option, index) in options"
-                :id="`${listboxId}-option-${index}`"
-                :key="String(option.value)"
-                type="button"
-                role="option"
-                :aria-selected="option.value === currentValue"
-                :data-active="index === activeIndex"
-                :class="
-                    classNames(
-                        styles.option,
-                        option.value === currentValue && styles['option-selected'],
-                        index === activeIndex && styles['option-active'],
-                        option.disabled && styles['option-disabled']
-                    )
-                "
-                :disabled="option.disabled"
-                @mouseenter="activeIndex = option.disabled ? activeIndex : index"
-                @click="handleSelect(option)"
+        <Teleport to="body">
+            <div
+                v-if="isOpen"
+                :id="listboxId"
+                ref="dropdownRef"
+                :class="styles.dropdown"
+                :style="floatingStyle"
+                role="listbox"
+                data-layer="floating"
+                data-state="open"
             >
-                {{ option.label }}
-            </button>
-        </div>
+                <button
+                    v-for="(option, index) in options"
+                    :id="`${listboxId}-option-${index}`"
+                    :key="String(option.value)"
+                    type="button"
+                    role="option"
+                    tabindex="-1"
+                    :data-option-index="index"
+                    :aria-selected="option.value === currentValue"
+                    :data-active="index === activeIndex"
+                    :class="
+                        classNames(
+                            styles.option,
+                            option.value === currentValue && styles['option-selected'],
+                            index === activeIndex && styles['option-active'],
+                            option.disabled && styles['option-disabled']
+                        )
+                    "
+                    :disabled="option.disabled"
+                    @mouseenter="activeIndex = option.disabled ? activeIndex : index"
+                    @click="handleSelect(option)"
+                >
+                    {{ option.label }}
+                </button>
+            </div>
+        </Teleport>
     </div>
 </template>

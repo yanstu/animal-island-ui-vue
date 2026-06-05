@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import styles from './cursor.module.less';
+import cursorIcon from './cursor-icon.png';
 
 defineOptions({
     name: 'Cursor',
@@ -25,7 +26,7 @@ const cursorStyle = computed(() => ({
     '--animal-cursor-url': props.src ? `url("${props.src}")` : undefined,
     '--animal-cursor-hotspot-x': String(props.hotspotX),
     '--animal-cursor-hotspot-y': String(props.hotspotY),
-    '--animal-cursor-value': `var(--animal-cursor-url, url('./cursor-icon.png')) var(--animal-cursor-hotspot-x, 4) var(--animal-cursor-hotspot-y, 0), auto`,
+    '--animal-cursor-value': `var(--animal-cursor-url, url("${cursorIcon}")) var(--animal-cursor-hotspot-x, 4) var(--animal-cursor-hotspot-y, 0), auto`,
 }));
 </script>
 

@@ -12,7 +12,6 @@ body {
     font-family: var(--animal-font-family);
     font-size: var(--animal-font-size-base);
     line-height: var(--animal-line-height-base);
-    color: var(--animal-text-color);
 }
 
 button,
@@ -23,7 +22,19 @@ select {
     color: inherit;
 }
 
-[class^='animal-'] {
+[class*='animal-'] {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+// 尊重用户「减少动态效果」的系统偏好，仅作用于组件库自身元素
+@media (prefers-reduced-motion: reduce) {
+    [class*='animal-'],
+    [class*='animal-'] *,
+    [class*='animal-']::before,
+    [class*='animal-']::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
 }

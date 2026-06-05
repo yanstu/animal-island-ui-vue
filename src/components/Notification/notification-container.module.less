@@ -1,0 +1,32 @@
+.container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 14px;
+    pointer-events: none;
+}
+
+.item {
+    pointer-events: auto;
+}
+
+.enterActive,
+.leaveActive {
+    transition:
+        opacity var(--animal-motion-duration-base) var(--animal-motion-ease),
+        transform var(--animal-motion-duration-base) var(--animal-motion-ease);
+}
+
+.enterFrom,
+.leaveTo {
+    opacity: 0;
+    transform: translateX(24px);
+}
+
+.move {
+    transition: transform var(--animal-motion-duration-base) var(--animal-motion-ease);
+}

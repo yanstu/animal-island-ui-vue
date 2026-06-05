@@ -16,7 +16,7 @@ import styles from './divider.module.less';
 // 类型定义
 export type DividerType = 'line-brown' | 'line-teal' | 'line-yellow' | 'wave-yellow';
 
-interface DividerProps {
+export interface DividerProps {
   type?: DividerType;
   className?: string;
   style?: Record<string, string | number>; 

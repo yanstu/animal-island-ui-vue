@@ -23,7 +23,7 @@ export { Empty } from './components/Empty';
 export type { EmptyProps } from './components/Empty';
 
 export { Form } from './components/Form';
-export type { FormProps } from './components/Form';
+export type { FormProps, FormRule, FormRuleTrigger } from './components/Form';
 
 export { FormItem } from './components/FormItem';
 export type { FormItemProps } from './components/FormItem';
@@ -31,11 +31,20 @@ export type { FormItemProps } from './components/FormItem';
 export { Radio } from './components/Radio';
 export type { RadioProps } from './components/Radio';
 
+export { RadioGroup } from './components/RadioGroup';
+export type { RadioGroupProps, RadioValue } from './components/RadioGroup';
+
 export { Select } from './components/Select';
 export type { SelectProps, SelectOption } from './components/Select';
 
-export { Notification } from './components/Notification';
-export type { NotificationProps } from './components/Notification';
+export { Notification, notification } from './components/Notification';
+export type {
+    NotificationProps,
+    NotificationApi,
+    NotificationOptions,
+    NotificationCloseFn,
+    NotificationType,
+} from './components/Notification';
 
 export { Progress } from './components/Progress';
 export type { ProgressProps } from './components/Progress';
@@ -68,7 +77,7 @@ export { Card } from './components/Card';
 export type { CardProps, CardType, CardColor } from './components/Card';
 
 export { Collapse } from './components/Collapse';
-export type { CollapseProps } from './components/Collapse';
+export type { CollapseProps, CollapseItem } from './components/Collapse';
 
 export { Cursor } from './components/Cursor';
 export type { CursorProps } from './components/Cursor';
@@ -87,8 +96,14 @@ export { default } from './plugin';
 export { List } from './components/List';
 export type { ListProps, ListItem } from './components/List';
 
-export { Message } from './components/Message';
-export type { MessageProps } from './components/Message';
+export { Message, message } from './components/Message';
+export type {
+    MessageProps,
+    MessageApi,
+    MessageOptions,
+    MessageCloseFn,
+    MessageType,
+} from './components/Message';
 
 export { Pagination } from './components/Pagination';
 export type { PaginationProps } from './components/Pagination';

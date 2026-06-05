@@ -8,10 +8,7 @@
 }
 
 .popup {
-    position: absolute;
-    bottom: calc(100% + 12px);
-    left: 50%;
-    transform: translateX(-50%);
+    z-index: 1100;
     max-width: 220px;
     padding: 10px 14px;
     border: 2px solid #d4c9b4;
@@ -29,11 +26,11 @@
 @keyframes animal-floating-enter {
     from {
         opacity: 0;
-        transform: translateX(-50%) translateY(6px);
+        transform: translateY(6px);
     }
 
     to {
         opacity: 1;
-        transform: translateX(-50%) translateY(0);
+        transform: translateY(0);
     }
 }

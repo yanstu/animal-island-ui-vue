@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue';
 import styles from './radio.module.less';
 import { classNames } from '@/internal/classNames';
+import {
+    RADIO_GROUP_KEY,
+    type RadioRegistration,
+    type RadioValue,
+} from '@/internal/radioContext';
 
 export interface RadioProps {
-    modelValue?: string | number | boolean;
-    value: string | number | boolean;
+    modelValue?: RadioValue;
+    value: RadioValue;
     disabled?: boolean;
 }
 
 const emit = defineEmits<{
-    (event: 'update:modelValue', value: string | number | boolean): void;
-    (event: 'change', value: string | number | boolean): void;
+    (event: 'update:modelValue', value: RadioValue): void;
+    (event: 'change', value: RadioValue): void;
 }>();
 
 defineOptions({
@@ -23,32 +28,74 @@ const props = withDefaults(defineProps<RadioProps>(), {
     disabled: false,
 });
 
-const checked = computed(() => props.modelValue === props.value);
+const group = inject(RADIO_GROUP_KEY, null);
+const rootRef = ref<HTMLButtonElement | null>(null);
+
+const checked = computed(() =>
+    group ? group.value.value === props.value : props.modelValue === props.value
+);
+
+const isDisabled = computed(
+    () => props.disabled || (group?.disabled.value ?? false)
+);
+
+const tabIndex = computed(() => {
+    if (!group) return undefined;
+    if (checked.value) return 0;
+    return group.focusValue.value === props.value ? 0 : -1;
+});
 
 const radioClassName = computed(() =>
     classNames(
         styles.radio,
         checked.value && styles['radio-checked'],
-        props.disabled && styles['radio-disabled']
+        isDisabled.value && styles['radio-disabled']
     )
 );
 
 const handleClick = () => {
-    if (props.disabled || checked.value) return;
+    if (isDisabled.value) return;
+
+    if (group) {
+        if (group.value.value !== props.value) {
+            group.setValue(props.value);
+        }
+        return;
+    }
+
+    if (checked.value) return;
     emit('update:modelValue', props.value);
     emit('change', props.value);
 };
+
+const registration: RadioRegistration = {
+    get value() {
+        return props.value;
+    },
+    isDisabled: () => isDisabled.value,
+    focus: () => rootRef.value?.focus(),
+};
+
+onMounted(() => {
+    group?.register(registration);
+});
+
+onBeforeUnmount(() => {
+    group?.unregister(registration);
+});
 </script>
 
 <template>
     <button
+        ref="rootRef"
         type="button"
         role="radio"
         :aria-checked="checked"
-        :aria-disabled="disabled || undefined"
+        :aria-disabled="isDisabled || undefined"
         :data-state="checked ? 'checked' : 'unchecked'"
+        :tabindex="tabIndex"
         :class="radioClassName"
-        :disabled="disabled"
+        :disabled="isDisabled"
         v-bind="$attrs"
         @click="handleClick"
     >

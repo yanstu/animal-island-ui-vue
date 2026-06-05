@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import {
     Avatar,
     Badge,
@@ -23,6 +23,7 @@ import {
     Popover,
     Progress,
     Radio,
+    RadioGroup,
     Rate,
     Select,
     Slider,
@@ -33,6 +34,8 @@ import {
     Tooltip,
     Loading,
     Typewriter,
+    message,
+    notification,
 } from '../src';
 import ApiTable from './ApiTable.vue';
 import CodeBlock from './CodeBlock.vue';
@@ -66,8 +69,59 @@ const titleModalOpen = ref(false);
 const customFooterOpen = ref(false);
 const footerlessModalOpen = ref(false);
 const textareaValue = ref('今晚 20:00 在广场集合，准备烟火大会布置。');
-const isLoadingActive = ref(true)
-const replayKey = ref(0)
+const isLoadingActive = ref(true);
+const replayKey = ref(0);
+
+const triggerMessage = (
+    type: 'info' | 'success' | 'warning',
+    content: string
+) => {
+    if (type === 'success') message.success(content);
+    else if (type === 'warning') message.warning(content);
+    else message.info(content);
+};
+
+const triggerNotification = () => {
+    notification.success('岛屿已开放', '访客现在可以登岛参观了。');
+};
+
+const radioGroupValue = ref('fishing');
+
+const faqActiveKeys = ref<string[]>(['open']);
+const faqItems = [
+    {
+        key: 'open',
+        title: '怎样开放岛屿？',
+        content: '完成基础布置并在公告板确认开放时间后即可对访客开放。',
+    },
+    {
+        key: 'visitor',
+        title: '来客如何安排？',
+        content: '可先通过公告板提醒，再按活动区域分流引导。',
+    },
+    {
+        key: 'rule',
+        title: '开放期间能改规则吗？',
+        content: '建议在开放结束后再调整，避免影响正在登岛的访客。',
+    },
+];
+
+const formModel = reactive({ name: '', desc: '' });
+const formRef = ref<{
+    validate: () => Promise<boolean>;
+    resetFields: () => void;
+} | null>(null);
+const formRules = {
+    name: [{ required: true, message: '请输入活动名称' }],
+    desc: [{ max: 60, message: '说明请控制在 60 字以内' }],
+};
+const submitForm = async () => {
+    if (await formRef.value?.validate()) {
+        message.success('活动信息已保存');
+    } else {
+        message.warning('请检查表单填写');
+    }
+};
 
 const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
 </script>
@@ -347,15 +401,38 @@ const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
                 </template>
 
                 <template v-else-if="activeKey === 'form'">
-                    <Form layout="vertical" class="form-demo">
-                        <FormItem label="活动名称">
-                            <Input placeholder="输入活动名称" />
+                    <Form
+                        ref="formRef"
+                        layout="vertical"
+                        class="form-demo"
+                        :model="formModel"
+                        :rules="formRules"
+                    >
+                        <FormItem label="活动名称" prop="name" required>
+                            <Input
+                                v-model="formModel.name"
+                                placeholder="输入活动名称"
+                            />
                         </FormItem>
                         <FormItem
                             label="开放说明"
+                            prop="desc"
                             extra="控制在 60 字以内更易阅读"
                         >
-                            <Textarea placeholder="输入开放说明" />
+                            <Textarea
+                                v-model="formModel.desc"
+                                placeholder="输入开放说明"
+                            />
+                        </FormItem>
+                        <FormItem>
+                            <div class="demo-row">
+                                <Button type="primary" @click="submitForm">
+                                    提交校验
+                                </Button>
+                                <Button @click="formRef?.resetFields()">
+                                    重置
+                                </Button>
+                            </div>
                         </FormItem>
                     </Form>
                 </template>
@@ -434,23 +511,62 @@ const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
 
                 <template v-else-if="activeKey === 'message'">
                     <div class="demo-stack">
-                        <Message content="今天的岛屿开放时间已更新" />
-                        <Message type="success" content="烟火大会布置已保存" />
-                        <Message type="warning" content="还有 2 项设置未完成" />
+                        <div class="demo-group">
+                            <div class="demo-label">命令式调用</div>
+                            <div class="demo-row">
+                                <Button
+                                    type="primary"
+                                    @click="triggerMessage('success', '烟火大会布置已保存')"
+                                >
+                                    成功提示
+                                </Button>
+                                <Button
+                                    @click="triggerMessage('warning', '还有 2 项设置未完成')"
+                                >
+                                    警告提示
+                                </Button>
+                                <Button
+                                    @click="triggerMessage('info', '今天的岛屿开放时间已更新')"
+                                >
+                                    普通提示
+                                </Button>
+                            </div>
+                        </div>
+                        <div class="demo-group">
+                            <div class="demo-label">静态展示</div>
+                            <div class="demo-stack">
+                                <Message content="今天的岛屿开放时间已更新" />
+                                <Message type="success" content="烟火大会布置已保存" />
+                                <Message type="warning" content="还有 2 项设置未完成" />
+                            </div>
+                        </div>
                     </div>
                 </template>
 
                 <template v-else-if="activeKey === 'notification'">
                     <div class="demo-stack">
-                        <Notification
-                            title="岛屿来客申请通过"
-                            description="今晚 20:00 后可以开始接待访客。"
-                        />
-                        <Notification
-                            type="success"
-                            title="上架完成"
-                            description="新增家具已经同步到今日精选页。"
-                        />
+                        <div class="demo-group">
+                            <div class="demo-label">命令式调用</div>
+                            <div class="demo-row">
+                                <Button type="primary" @click="triggerNotification">
+                                    弹出通知
+                                </Button>
+                            </div>
+                        </div>
+                        <div class="demo-group">
+                            <div class="demo-label">静态展示</div>
+                            <div class="demo-stack">
+                                <Notification
+                                    title="岛屿来客申请通过"
+                                    description="今晚 20:00 后可以开始接待访客。"
+                                />
+                                <Notification
+                                    type="success"
+                                    title="上架完成"
+                                    description="新增家具已经同步到今日精选页。"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </template>
 
@@ -527,16 +643,34 @@ const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
                 </template>
 
                 <template v-else-if="activeKey === 'radio'">
-                    <div
-                        class="demo-row radio-row"
-                        role="radiogroup"
-                        aria-label="活动类型"
-                    >
-                        <Radio v-model="radioValue" value="fish">鱼类</Radio>
-                        <Radio v-model="radioValue" value="bug">昆虫</Radio>
-                        <Radio :model-value="radioValue" value="flower" disabled
-                            >花艺</Radio
-                        >
+                    <div class="demo-stack">
+                        <div class="demo-group">
+                            <div class="demo-label">
+                                RadioGroup 分组（方向键可切换）
+                            </div>
+                            <RadioGroup v-model="radioGroupValue">
+                                <Radio value="fishing">钓鱼大赛</Radio>
+                                <Radio value="bug">捉虫大会</Radio>
+                                <Radio value="meteor" disabled>流星观测</Radio>
+                            </RadioGroup>
+                        </div>
+                        <div class="demo-group">
+                            <div class="demo-label">单独使用</div>
+                            <div
+                                class="demo-row radio-row"
+                                role="radiogroup"
+                                aria-label="活动类型"
+                            >
+                                <Radio v-model="radioValue" value="fish">鱼类</Radio>
+                                <Radio v-model="radioValue" value="bug">昆虫</Radio>
+                                <Radio
+                                    :model-value="radioValue"
+                                    value="flower"
+                                    disabled
+                                    >花艺</Radio
+                                >
+                            </div>
+                        </div>
                     </div>
                 </template>
 
@@ -807,6 +941,14 @@ const currentDoc = computed(() => docsMap[props.activeKey] ?? docsMap.about);
                                 question="暂不可修改的规则"
                                 answer="当前开放期间不可调整。"
                                 disabled
+                            />
+                        </div>
+                        <div class="demo-group">
+                            <div class="demo-label">多面板 / 手风琴</div>
+                            <Collapse
+                                v-model="faqActiveKeys"
+                                accordion
+                                :items="faqItems"
                             />
                         </div>
                     </div>

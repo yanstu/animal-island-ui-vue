@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, toRef, useId, watch } from 'vue';
 import { Button } from '../Button';
 import { Cursor } from '../Cursor';
+import { useFocusTrap } from '@/internal/useFocusTrap';
 import styles from './modal.module.less';
 
 export interface ModalProps {
@@ -41,7 +42,10 @@ defineOptions({
 
 const dialogRef = ref<HTMLDivElement | null>(null);
 const closeButtonRef = ref<HTMLButtonElement | null>(null);
+const titleId = useId();
 let restoreFocusTarget: HTMLElement | null = null;
+
+useFocusTrap(dialogRef, toRef(props, 'open'));
 
 const handleClose = () => {
     emit('update:open', false);
@@ -105,6 +109,7 @@ const showFooter = computed(() => props.footer !== null);
                     :style="{ width }"
                     role="dialog"
                     aria-modal="true"
+                    :aria-labelledby="title || $slots.title ? titleId : undefined"
                     tabindex="-1"
                     v-bind="$attrs"
                     @click.stop
@@ -124,7 +129,11 @@ const showFooter = computed(() => props.footer !== null);
                     </svg>
                     <div :class="styles.modalClipped">
                         <div v-if="title || closable" :class="styles.header">
-                            <div v-if="title || $slots.title" :class="styles.title">
+                            <div
+                                v-if="title || $slots.title"
+                                :id="titleId"
+                                :class="styles.title"
+                            >
                                 <slot name="title">{{ title }}</slot>
                             </div>
                             <button
@@ -143,7 +152,7 @@ const showFooter = computed(() => props.footer !== null);
                         </div>
                         <div v-if="showFooter" :class="styles.footer">
                             <slot name="footer">
-                                <Button type="primary" @click="handleClose">
+                                <Button type="default" @click="handleClose">
                                     取消
                                 </Button>
                                 <Button type="primary" @click="handleOk">

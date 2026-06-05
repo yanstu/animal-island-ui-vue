@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('Tooltip', () => {
     it('exports component and shows content on hover', async () => {
@@ -10,6 +10,7 @@ describe('Tooltip', () => {
         const wrapper = mount(library.Tooltip as NonNullable<typeof library.Tooltip>, {
             props: {
                 content: '今天适合钓鱼',
+                openDelay: 0,
             },
             slots: {
                 default: '<button>查看提示</button>',
@@ -29,6 +30,7 @@ describe('Tooltip', () => {
         const wrapper = mount(library.Tooltip as NonNullable<typeof library.Tooltip>, {
             props: {
                 content: '记得给岛民送礼物',
+                openDelay: 0,
             },
             slots: {
                 default: '<button>查看提示</button>',
@@ -55,6 +57,7 @@ describe('Tooltip', () => {
         const wrapper = mount(library.Tooltip as NonNullable<typeof library.Tooltip>, {
             props: {
                 content: '今天适合钓鱼',
+                openDelay: 0,
             },
             slots: {
                 default: '<button>查看提示</button>',
@@ -67,5 +70,29 @@ describe('Tooltip', () => {
         expect(popup.attributes('data-layer')).toBe('floating');
         expect(popup.attributes('data-state')).toBe('open');
         expect(wrapper.get('[data-tooltip-trigger]').attributes('data-state')).toBe('open');
+    });
+
+    it('delays showing on hover by the configured openDelay', async () => {
+        const library = await import('../../src');
+        vi.useFakeTimers();
+
+        const wrapper = mount(library.Tooltip as NonNullable<typeof library.Tooltip>, {
+            props: {
+                content: '稍候出现',
+                openDelay: 200,
+            },
+            slots: {
+                default: '<button>悬停查看</button>',
+            },
+        });
+
+        await wrapper.get('[data-tooltip-trigger]').trigger('mouseenter');
+        expect(wrapper.text()).not.toContain('稍候出现');
+
+        vi.advanceTimersByTime(200);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.text()).toContain('稍候出现');
+
+        vi.useRealTimers();
     });
 });
